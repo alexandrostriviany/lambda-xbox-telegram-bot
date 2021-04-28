@@ -1,0 +1,5 @@
+rootProject.name = 'lambda-xbox-telegram-bot'
+include 'xlive-price-bot'
+include 'xlive-price-filler'
+include 'xlive-price-common'
+
