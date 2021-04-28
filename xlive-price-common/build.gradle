@@ -1,0 +1,9 @@
+version 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	compile group: 'com.vdurmont', name: 'emoji-java', version: '4.0.0'
+}

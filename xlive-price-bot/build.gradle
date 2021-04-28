@@ -1,0 +1,55 @@
+import com.amazonaws.services.lambda.model.Runtime
+import jp.classmethod.aws.gradle.lambda.AWSLambdaUpdateFunctionCodeTask
+import jp.classmethod.aws.gradle.lambda.AWSLambdaCreateFunctionTask
+
+plugins {
+	id 'java'
+	id 'jp.classmethod.aws.lambda' version '0.35'
+}
+
+group 'com.lambdatelegram'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile "org.telegram:telegrambots:4.4.0.1"
+	compile project(':xlive-price-common')
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+aws {
+	profileName = 'personal'
+}
+
+lambda {
+	region = "eu-central-1"
+}
+
+def lambda_name_test = "xlive-price-bot"
+def lambda_name_production = "xlive-price-bot-prod"
+
+task buildZip(type: Zip) {
+	from compileJava
+	from processResources
+	into('lib') {
+		from configurations.runtimeClasspath
+	}
+}
+
+build.dependsOn buildZip
+
+task deploy(type: AWSLambdaUpdateFunctionCodeTask, dependsOn: build) {
+	functionName = lambda_name_test
+	zipFile = buildZip.archivePath
+}
+
+task deploy_production(type: AWSLambdaUpdateFunctionCodeTask, dependsOn: build) {
+	functionName = lambda_name_production
+	zipFile = jar.archivePath
+}
+

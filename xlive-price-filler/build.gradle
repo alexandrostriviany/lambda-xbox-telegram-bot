@@ -1,0 +1,52 @@
+import com.amazonaws.services.lambda.model.Runtime
+import jp.classmethod.aws.gradle.lambda.AWSLambdaUpdateFunctionCodeTask
+import jp.classmethod.aws.gradle.lambda.AWSLambdaCreateFunctionTask
+
+plugins {
+	id 'java'
+	id 'jp.classmethod.aws.lambda' version '0.35'
+}
+
+group 'com.lambdatelegram'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile project(':xlive-price-common')
+}
+
+aws {
+	profileName = 'personal'
+}
+
+lambda {
+	region = "eu-central-1"
+}
+
+def lambda_name_test = "xlive-price-filler"
+def lambda_name_production = "xlive-price-filler-prod"
+
+task buildZip(type: Zip) {
+	from compileJava
+	from processResources
+	into('lib') {
+		from configurations.runtime
+	}
+}
+
+build.dependsOn buildZip
+
+task deploy(type: AWSLambdaUpdateFunctionCodeTask, dependsOn: build) {
+	functionName = lambda_name_test
+	zipFile = buildZip.archivePath
+}
+
+task deploy_production(type: AWSLambdaUpdateFunctionCodeTask, dependsOn: build) {
+	functionName = lambda_name_production
+	zipFile = jar.archivePath
+}

@@ -1,0 +1,9 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 501
+      MemorySize: 512
+      Handler: com.lambdatelegram.App
+      CodeUri: /Users/oleksandrmosin/Documents/lambda-xbox-telegram-bot/xlive-price-filler
+      Runtime: java8.al2
