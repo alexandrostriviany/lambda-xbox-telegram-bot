@@ -2,11 +2,11 @@ package com.lambdatelegram.xlivepricebot;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.amazonaws.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lambdatelegram.common.DynamoDbProvider;
 import com.lambdatelegram.common.enums.Subscriptions;
 import com.lambdatelegram.common.models.XboxSubscriptionPrice;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -84,7 +84,7 @@ public class App implements RequestStreamHandler {
                 sendPriceChangedMessage(updateMessage, UPDATED_LOGO_PATH);
             } else {
                 if (updateMessage.contains("start")) {
-                    sendPricePhotoMessage(userId, "", DEFAULT_LOGO_PATH);
+                    sendPricePhotoMessage(userId, "Welcome! This bot helps to keep track of changes in XBOX subscription prices and promotions.", DEFAULT_LOGO_PATH);
                     return;
                 }
                 if (updateMessage.contains(LIVE_GOLD_MESSAGE)) {
