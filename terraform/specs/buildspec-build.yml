@@ -1,24 +1,21 @@
 version: 0.2
-env:
-  parameter-store:
-    ARTIFACTORY_USER: "/CodeBuild/aqa/artifactory/username"
-    ARTIFACTORY_PASS: "/CodeBuild/aqa/artifactory/password"
 phases:
   install:
     runtime-versions:
       java: openjdk8
     commands:
       - |
-        curl -s -qL -o gradle.zip https://services.gradle.org/distributions/gradle-7.2-bin.zip
+        wget https://services.gradle.org/distributions/gradle-7.2-bin.zip
       - mkdir /opt/gradle
-      - sudo unzip -o gradle.zip -d /opt/gradle
-      - sudo chmod +x /opt/gradle/bin/gradle
+      - unzip -d /opt/gradle gradle-7.2-bin.zip
+      - export PATH=$PATH:/opt/gradle/gradle-7.2/bin
+      - gradle -v
   build:
     commands:
       - echo "[INFO] Build Java project"
       - cd xlive-price-bot
       - gradle clean --exclude-task test compileTestJava build
-      - echo "[INFO] Package tests to zip"
+      - echo "[INFO] Package lambda to zip"
       - gradle buildZip
       - printenv
 artifacts:

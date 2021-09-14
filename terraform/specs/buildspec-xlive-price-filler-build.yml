@@ -1,0 +1,24 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      - |
+        wget https://services.gradle.org/distributions/gradle-7.2-bin.zip
+      - mkdir /opt/gradle
+      - unzip -d /opt/gradle gradle-7.2-bin.zip
+      - export PATH=$PATH:/opt/gradle/gradle-7.2/bin
+      - gradle -v
+  build:
+    commands:
+      - echo "[INFO] Build xlive-price-filler Java project"
+      - cd xlive-price-filler
+      - gradle clean --exclude-task test compileTestJava build
+      - echo "[INFO] Package lambda to zip"
+      - gradle buildZip
+      - printenv
+artifacts:
+  files:
+    - 'xlive-price-filler.zip'
+  base-directory: 'xlive-price-filler/build/distributions/'

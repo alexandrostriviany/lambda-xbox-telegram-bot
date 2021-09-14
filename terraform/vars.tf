@@ -47,3 +47,6 @@ variable "BOT_USERNAME" {
   type = string
   default = "Subscription_checker_bot"
 }
+variable "git_token" {
+  type = string
+}
