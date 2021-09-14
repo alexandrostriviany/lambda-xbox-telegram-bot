@@ -1,0 +1,23 @@
+version: 0.2
+
+env:
+  parameter-store:
+    TF_VAR_BOT_TOKEN: "/XlivePriceBot/token"
+    TF_VAR_BOT_USERNAME: "/XlivePriceBot/name"
+    TF_VAR_BOT_PATH: "/XlivePriceBot/apiPath"
+
+phases:
+  install:
+    commands:
+      # install terraform binary
+      - curl -s -qL -o terraform_install.zip https://releases.hashicorp.com/terraform/0.14.8/terraform_0.14.8_linux_amd64.zip
+      - unzip terraform_install.zip -d /usr/bin/
+      - chmod +x /usr/bin/terraform
+    finally:
+      - terraform --version
+  build:
+    commands:
+      - echo "[INFO] Deploy lambda"
+      - cd terraform/bot
+      - terraform init -no-color -input=false
+      - terraform apply -no-color -auto-approve -lock=false

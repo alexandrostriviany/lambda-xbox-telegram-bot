@@ -1,52 +1,5 @@
-resource "aws_iam_role" "lambda_exec" {
-  name               = var.iam-role-name
-  assume_role_policy = jsonencode(
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        Action: "sts:AssumeRole",
-        Principal: {
-          "Service": "lambda.amazonaws.com"
-        },
-        Effect: "Allow",
-        Sid: ""
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "role_policy" {
-  policy = jsonencode(
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        Action: [
-          "cloudwatch:*",
-          "logs:*",
-          "dynamodb:*",
-          "lambda:*",
-        ],
-        Effect: "Allow",
-        Resource: "*"
-      }
-    ]
-  }
-  )
-  role   = aws_iam_role.lambda_exec.id
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.xlive-price-filler.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.xlive-price-cron-trigger.arn
-}
-
 resource "aws_iam_role" "code_build_role" {
-  name               = "lambda-build-role"
+  name               = "xlive-bot-lambda-build-role"
   description        = "CodeBuild role for lambda"
   assume_role_policy = data.aws_iam_policy_document.code_build_assume.json
 }
@@ -169,6 +122,73 @@ data "aws_iam_policy_document" "code_build" {
       "ssm:GetParameter",
       "ssm:GetParameters",
       "ssm:GetParametersByPath"
+    ]
+  }
+}
+
+##########pipeline##############
+
+resource "aws_iam_role" "code_pipeline" {
+  name               = "xlive-telegram-bot-code-pipeline-role"
+  description        = "CodePipeline role for xlive-telegram-bot"
+  assume_role_policy = data.aws_iam_policy_document.code_pipeline_assume.json
+}
+
+resource "aws_iam_policy" "code_pipeline" {
+  name        = "xlive-telegram-bot-code-pipeline-policy"
+  path        = "/service-role/"
+  description = "CodePipeline policy for xlive-telegram-bot"
+  policy      = data.aws_iam_policy_document.code_pipeline.json
+}
+
+resource "aws_iam_policy_attachment" "code_pipeline" {
+  name       = "xlive-telegram-bot-pipeline-policy-attachment"
+  roles      = [
+    aws_iam_role.code_pipeline.name]
+  policy_arn = aws_iam_policy.code_pipeline.arn
+}
+
+data "aws_iam_policy_document" "code_pipeline_assume" {
+  statement {
+    actions = [
+      "sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "codepipeline.amazonaws.com"]
+    }
+  }
+}
+data "aws_iam_policy_document" "code_pipeline" {
+  statement {
+    sid    = "allowS3ArtifactBuckets"
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+
+    actions = [
+      "s3:Put*",
+      "s3:Get*",
+      "s3:ListBucket",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion"
+    ]
+  }
+
+  statement {
+    sid    = "allowCodeBuild"
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+
+    actions = [
+      "codebuild:StartBuild",
+      "codebuild:BatchGetBuilds"
     ]
   }
 }

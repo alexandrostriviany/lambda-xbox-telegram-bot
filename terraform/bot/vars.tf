@@ -23,30 +23,30 @@ variable "artifacts_s3_store" {
   type = string
   default = "xlive-bot-artifacts-s3-store"
 }
+
+variable "source_s3_store" {
+  type = string
+  default = "xlive-bot-source-s3-store"
+}
 variable "PRICE_TABLE" {
   type = string
   default = "xlive_bot_price_table"
 }
 variable "XLIVE_PRICE_FILLER_CHAT_ID" {
   type = string
-  default = "777999"
 }
 variable "BOT_PATH" {
   type = string
-  default = "telegram"
 }
-variable "BOT_URL" {
-  type = string
-  default = "https://s8rdeqo660.execute-api.eu-central-1.amazonaws.com/prod/telegram"
-}
+//variable "BOT_URL" {
+//  type = string
+//  default = "https://s8rdeqo660.execute-api.eu-central-1.amazonaws.com/prod/telegram"
+//}
+
 variable "BOT_TOKEN" {
   type = string
-  default = "1715327145:AAHnvUtfVqWV2sy8HkPTWvR5k90Db8968SQ"
 }
 variable "BOT_USERNAME" {
   type = string
-  default = "Subscription_checker_bot"
 }
-variable "git_token" {
-  type = string
-}
+

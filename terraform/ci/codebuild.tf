@@ -4,19 +4,19 @@ resource "aws_cloudwatch_log_group" "codebuild" {
   retention_in_days = 30
 }
 
-resource "aws_codebuild_source_credential" "github" {
-  auth_type   = "PERSONAL_ACCESS_TOKEN"
-  server_type = "GITHUB"
-  token       = var.git_token
-}
+//resource "aws_codebuild_source_credential" "github" {
+//  auth_type   = "PERSONAL_ACCESS_TOKEN"
+//  server_type = "GITHUB"
+//  token       = var.git_token
+//}
 
 ########################################
 ##  CodeBuild - Build xlive-price-bot ##
 ########################################
 
 resource "aws_codebuild_project" "telegram_bot_build" {
-  name          = "telegram-bot"
-  description   = "Build Telegram Bot Project"
+  name          = "xlive-price-bot"
+  description   = "Build xlive-price-bot Telegram Bot Project"
   build_timeout = 20
   service_role  = aws_iam_role.code_build_role.arn
 
@@ -29,14 +29,8 @@ resource "aws_codebuild_project" "telegram_bot_build" {
   }
 
   source {
-    auth {
-      type     = "OAUTH"
-      resource = aws_codebuild_source_credential.github.arn
-    }
-    type            = "GITHUB"
-    location        = "https://github.com/alexandrostriviany/lambda-xbox-telegram-bot.git"
-    git_clone_depth = 1
-    buildspec       = "terraform/specs/buildspec-build.yml"
+    type      = "CODEPIPELINE"
+    buildspec = "terraform/ci/specs/buildspec-build.yml"
   }
 
   cache {
@@ -46,19 +40,13 @@ resource "aws_codebuild_project" "telegram_bot_build" {
   }
 
   artifacts {
-    name                   = "xlive-price-bot.zip"
-    type                   = "S3"
-    encryption_disabled    = "true"
-    path                   = "lambda/"
-    location               = var.artifacts_s3_store
-    packaging              = "ZIP"
-    override_artifact_name = true
+    type = "CODEPIPELINE"
   }
 
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "java-client-build"
+      stream_name = "xlive-price-bot-build"
     }
   }
 }
@@ -82,14 +70,48 @@ resource "aws_codebuild_project" "xlive_price_filler_build" {
   }
 
   source {
-    auth {
-      type     = "OAUTH"
-      resource = aws_codebuild_source_credential.github.arn
+    type      = "CODEPIPELINE"
+    buildspec = "terraform/ci/specs/buildspec-xlive-price-filler-build.yml"
+  }
+
+  cache {
+    type  = "LOCAL"
+    modes = [
+      "LOCAL_DOCKER_LAYER_CACHE"]
+  }
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+
+  logs_config {
+    cloudwatch_logs {
+      group_name  = aws_cloudwatch_log_group.codebuild.name
+      stream_name = "xlive-price-filler-build"
     }
-    type            = "GITHUB"
-    location        = "https://github.com/alexandrostriviany/lambda-xbox-telegram-bot.git"
-    git_clone_depth = 1
-    buildspec       = "terraform/specs/buildspec-xlive-price-filler-build.yml"
+  }
+}
+
+###########################################
+##  CodeBuild - Deploy application       ##
+###########################################
+
+resource "aws_codebuild_project" "deploy" {
+  name          = "xlive-deploy"
+  description   = "Deploy xlive-price-application"
+  build_timeout = 20
+  service_role  = aws_iam_role.code_build_role.arn
+
+  environment {
+    type                        = "LINUX_CONTAINER"
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image                       = "aws/codebuild/standard:3.0"
+    image_pull_credentials_type = "CODEBUILD"
+    privileged_mode             = true
+  }
+
+  source {
+    type      = "CODEPIPELINE"
+    buildspec = "terraform/ci/specs/buildspec-application-deploy.yml"
   }
 
   cache {
@@ -99,19 +121,13 @@ resource "aws_codebuild_project" "xlive_price_filler_build" {
   }
 
   artifacts {
-    name                   = "xlive-price-filler.zip"
-    type                   = "S3"
-    encryption_disabled    = "true"
-    path                   = "lambda/"
-    location               = var.artifacts_s3_store
-    packaging              = "ZIP"
-    override_artifact_name = true
+    type = "CODEPIPELINE"
   }
 
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "java-client-build"
+      stream_name = "xlive-deploy"
     }
   }
 }
