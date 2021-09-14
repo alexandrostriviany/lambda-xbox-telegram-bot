@@ -105,7 +105,7 @@ resource "aws_codepipeline" "xlive_telegram_bot" {
       owner           = "AWS"
       provider        = "CodeBuild"
       version         = "1"
-      run_order = 1
+      run_order       = 1
       input_artifacts = [
         "Source"]
 
@@ -124,12 +124,12 @@ resource "aws_codepipeline" "xlive_telegram_bot" {
     }
 
     action {
-      name            = "Set telegram webhook"
+      name            = "SetTelegramWebhook"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
       version         = "1"
-      run_order = 1
+      run_order       = 3
       input_artifacts = [
         "Source"]
 
