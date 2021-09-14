@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_lambda_function" "xlive-price-filler" {
 
   s3_bucket = var.artifacts_s3_store
-  s3_key    = "lambda/xlive-price-filler.zip"
+  s3_key    = "xlive-price-filler.zip"
 
   function_name = var.lambda_filler_name
   handler       = "com.lambdatelegram.App"
@@ -25,7 +25,7 @@ resource "aws_lambda_function" "xlive-price-bot-lambda" {
 
 
   s3_bucket = var.artifacts_s3_store
-  s3_key    = "lambda/xlive-price-bot.zip"
+  s3_key    = "xlive-price-bot.zip"
 
   function_name = var.lambda_bot_name
   handler       = "com.lambdatelegram.xlivepricebot.App"
