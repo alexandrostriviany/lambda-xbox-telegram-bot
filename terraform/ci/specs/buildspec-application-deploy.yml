@@ -15,3 +15,6 @@ phases:
       - cd terraform/bot
       - terraform init -no-color -input=false
       - terraform apply -no-color -auto-approve -lock=false
+  post_build:
+    commands:
+      - printenv
