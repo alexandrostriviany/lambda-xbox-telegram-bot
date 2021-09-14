@@ -77,7 +77,8 @@ data "aws_iam_policy_document" "code_build" {
       "*"
     ]
     actions   = [
-      "events:*"]
+      "events:*",
+      "cloudwatch:*"]
   }
   statement {
     sid       = "allowCloudWatchLogs"
@@ -124,6 +125,15 @@ data "aws_iam_policy_document" "code_build" {
       "ssm:GetParametersByPath"
     ]
   }
+  statement {
+    sid       = "allowDynamoDb"
+    effect    = "Allow"
+    resources = [
+      "*"]
+    actions   = [
+      "dynamodb:*"
+    ]
+  }
 }
 
 ##########pipeline##############
@@ -154,7 +164,7 @@ data "aws_iam_policy_document" "code_pipeline_assume" {
       "sts:AssumeRole"]
 
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = [
         "codepipeline.amazonaws.com"]
     }
