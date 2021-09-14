@@ -1,11 +1,5 @@
 version: 0.2
 
-env:
-  parameter-store:
-    TF_VAR_BOT_TOKEN: "/XlivePriceBot/token"
-    TF_VAR_BOT_USERNAME: "/XlivePriceBot/name"
-    TF_VAR_BOT_PATH: "/XlivePriceBot/apiPath"
-
 phases:
   install:
     commands:

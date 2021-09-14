@@ -10,7 +10,7 @@ resource "aws_api_gateway_rest_api" "xlive-price-bot-api" {
 resource "aws_api_gateway_resource" "resource" {
   rest_api_id = aws_api_gateway_rest_api.xlive-price-bot-api.id
   parent_id   = aws_api_gateway_rest_api.xlive-price-bot-api.root_resource_id
-  path_part   = var.BOT_PATH
+  path_part   = data.aws_ssm_parameter.path.value
 }
 
 resource "aws_api_gateway_method" "gw-method" {

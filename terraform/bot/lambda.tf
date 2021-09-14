@@ -35,8 +35,8 @@ resource "aws_lambda_function" "xlive-price-bot-lambda" {
   memory_size   = 512
   environment {
     variables = {
-      bot_token                  = var.BOT_TOKEN
-      bot_username               = var.BOT_USERNAME
+      bot_token                  = data.aws_ssm_parameter.token.value
+      bot_username               = data.aws_ssm_parameter.name.value
       PRICE_TABLE                = var.PRICE_TABLE
       REGION                     = var.region
       XLIVE_PRICE_FILLER_CHAT_ID = var.XLIVE_PRICE_FILLER_CHAT_ID

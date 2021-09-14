@@ -15,6 +15,18 @@ resource "aws_s3_bucket" "source_lambda_store_s3_bucket" {
   force_destroy = true
 }
 
+data "aws_ssm_parameter" "token" {
+  name = "/XlivePriceBot/token"
+}
+
+data "aws_ssm_parameter" "name" {
+  name = "/XlivePriceBot/name"
+}
+
+data "aws_ssm_parameter" "path" {
+  name = "/XlivePriceBot/apiPath"
+}
+
 terraform {
   backend "s3" {
     bucket         = "xlive-bot-terraform-state"

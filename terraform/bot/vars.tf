@@ -34,19 +34,20 @@ variable "PRICE_TABLE" {
 }
 variable "XLIVE_PRICE_FILLER_CHAT_ID" {
   type = string
+  default = "777999"
 }
-variable "BOT_PATH" {
-  type = string
-}
-//variable "BOT_URL" {
+//variable "BOT_PATH" {
 //  type = string
-//  default = "https://s8rdeqo660.execute-api.eu-central-1.amazonaws.com/prod/telegram"
 //}
-
-variable "BOT_TOKEN" {
-  type = string
-}
-variable "BOT_USERNAME" {
-  type = string
-}
+////variable "BOT_URL" {
+////  type = string
+////  default = "https://s8rdeqo660.execute-api.eu-central-1.amazonaws.com/prod/telegram"
+////}
+//
+//variable "BOT_TOKEN" {
+//  type = string
+//}
+//variable "BOT_USERNAME" {
+//  type = string
+//}
 
