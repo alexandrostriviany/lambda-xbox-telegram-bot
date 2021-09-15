@@ -11,14 +11,13 @@ resource "aws_codepipeline" "xlive_telegram_bot" {
     name = "Source"
 
     action {
-      name             = "Source"
-      category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
-      version          = "1"
+      name     = "Source"
+      category = "Source"
+      owner    = "ThirdParty"
+      provider = "GitHub"
+      version  = "1"
       output_artifacts = [
-        "Source"]
-
+      "Source"]
       configuration = {
         OAuthToken = data.aws_ssm_parameter.ami.value
         Owner      = var.github_owner
@@ -32,31 +31,31 @@ resource "aws_codepipeline" "xlive_telegram_bot" {
     name = "Build"
 
     action {
-      name             = "xlive-price-bot"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      input_artifacts  = [
-        "Source"]
+      name     = var.lambda_bot_name
+      category = "Build"
+      owner    = "AWS"
+      provider = "CodeBuild"
+      version  = "1"
+      input_artifacts = [
+      "Source"]
       output_artifacts = [
-        "XlivePriceBotZip"]
-      configuration    = {
+      "XlivePriceBotZip"]
+      configuration = {
         ProjectName = aws_codebuild_project.telegram_bot_build.name
       }
     }
 
     action {
-      name             = "xlive-price-filler"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      input_artifacts  = [
-        "Source"]
+      name     = var.lambda_filler_name
+      category = "Build"
+      owner    = "AWS"
+      provider = "CodeBuild"
+      version  = "1"
+      input_artifacts = [
+      "Source"]
       output_artifacts = [
-        "XlivePriceFillerZip"]
-      configuration    = {
+      "XlivePriceFillerZip"]
+      configuration = {
         ProjectName = aws_codebuild_project.xlive_price_filler_build.name
       }
     }
@@ -64,31 +63,29 @@ resource "aws_codepipeline" "xlive_telegram_bot" {
   }
 
   stage {
-    name = "DeployToS3"
+    name = "DeployArtifactsToS3"
 
     action {
-      name            = "PriceFillerZip"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "S3"
-      version         = "1"
+      name     = "PriceFillerZip"
+      category = "Deploy"
+      owner    = "AWS"
+      provider = "S3"
+      version  = "1"
       input_artifacts = [
-        "XlivePriceFillerZip"]
-
+      "XlivePriceFillerZip"]
       configuration = {
         BucketName = aws_s3_bucket.test_lambda_store_s3_bucket.bucket
         Extract    = "true"
       }
     }
     action {
-      name            = "TelegramBotZip"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "S3"
-      version         = "1"
+      name     = "TelegramBotZip"
+      category = "Deploy"
+      owner    = "AWS"
+      provider = "S3"
+      version  = "1"
       input_artifacts = [
-        "XlivePriceBotZip"]
-
+      "XlivePriceBotZip"]
       configuration = {
         BucketName = aws_s3_bucket.test_lambda_store_s3_bucket.bucket
         Extract    = "true"
@@ -100,39 +97,37 @@ resource "aws_codepipeline" "xlive_telegram_bot" {
     name = "DeployApplication"
 
     action {
-      name            = "Publish"
-      category        = "Build"
-      owner           = "AWS"
-      provider        = "CodeBuild"
-      version         = "1"
-      run_order       = 1
-      input_artifacts = [
-        "Source"]
+      name      = "ManualApproval"
+      category  = "Approval"
+      owner     = "AWS"
+      provider  = "Manual"
+      version   = "1"
+      run_order = 1
+    }
 
+    action {
+      name      = "ApplyBotTerraformScripts"
+      category  = "Build"
+      owner     = "AWS"
+      provider  = "CodeBuild"
+      version   = "1"
+      run_order = 2
+      input_artifacts = [
+      "Source"]
       configuration = {
         ProjectName = aws_codebuild_project.deploy.name
       }
     }
 
     action {
-      name      = "ManualApproval"
-      category  = "Approval"
+      name      = "SetTelegramWebhook"
+      category  = "Build"
       owner     = "AWS"
-      provider  = "Manual"
+      provider  = "CodeBuild"
       version   = "1"
-      run_order = 2
-    }
-
-    action {
-      name            = "SetTelegramWebhook"
-      category        = "Build"
-      owner           = "AWS"
-      provider        = "CodeBuild"
-      version         = "1"
-      run_order       = 3
+      run_order = 3
       input_artifacts = [
         "Source"]
-
       configuration = {
         ProjectName = aws_codebuild_project.set_webhook.name
       }

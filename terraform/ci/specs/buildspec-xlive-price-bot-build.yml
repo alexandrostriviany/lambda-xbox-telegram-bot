@@ -17,7 +17,6 @@ phases:
       - gradle clean --exclude-task test compileTestJava build
       - echo "[INFO] Package lambda to zip"
       - gradle buildZip
-      - printenv
 artifacts:
   files:
     - 'xlive-price-bot.zip'

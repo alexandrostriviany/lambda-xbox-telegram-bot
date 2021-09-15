@@ -1,3 +1,5 @@
+
+##################### codebuild role ###############################
 resource "aws_iam_role" "code_build_role" {
   name               = "xlive-bot-lambda-build-role"
   description        = "CodeBuild role for lambda"
@@ -5,9 +7,9 @@ resource "aws_iam_role" "code_build_role" {
 }
 
 resource "aws_iam_policy_attachment" "codebuild_policy_attachment" {
-  name       = "codebuild_policy_attachment"
-  roles      = [
-    aws_iam_role.code_build_role.name]
+  name = "codebuild_policy_attachment"
+  roles = [
+  aws_iam_role.code_build_role.name]
   policy_arn = aws_iam_policy.codebuild_iam_policy.arn
 }
 
@@ -15,12 +17,12 @@ resource "aws_iam_policy_attachment" "codebuild_policy_attachment" {
 data "aws_iam_policy_document" "code_build_assume" {
   statement {
     actions = [
-      "sts:AssumeRole"]
+    "sts:AssumeRole"]
 
     principals {
-      type        = "Service"
+      type = "Service"
       identifiers = [
-        "codebuild.amazonaws.com"]
+      "codebuild.amazonaws.com"]
     }
   }
 }
@@ -33,11 +35,11 @@ resource "aws_iam_policy" "codebuild_iam_policy" {
 
 data "aws_iam_policy_document" "code_build" {
   statement {
-    sid       = "generalReadAccess"
-    effect    = "Allow"
+    sid    = "generalReadAccess"
+    effect = "Allow"
     resources = [
-      "*"]
-    actions   = [
+    "*"]
+    actions = [
       "acm:DescribeCertificate",
       "acm:GetCertificate",
       "acm:List*",
@@ -53,77 +55,77 @@ data "aws_iam_policy_document" "code_build" {
   }
 
   statement {
-    sid       = "allowIAMLambda"
-    effect    = "Allow"
+    sid    = "allowIAMLambda"
+    effect = "Allow"
     resources = [
       "*"
     ]
-    actions   = [
-      "iam:*"]
+    actions = [
+    "iam:*"]
   }
   statement {
-    sid       = "allowLambda"
-    effect    = "Allow"
+    sid    = "allowLambda"
+    effect = "Allow"
     resources = [
       "*"
     ]
-    actions   = [
-      "lambda:*"]
+    actions = [
+    "lambda:*"]
   }
   statement {
-    sid       = "allowCloudWatchEvents"
-    effect    = "Allow"
+    sid    = "allowCloudWatchEvents"
+    effect = "Allow"
     resources = [
       "*"
     ]
-    actions   = [
+    actions = [
       "events:*",
-      "cloudwatch:*"]
+    "cloudwatch:*"]
   }
   statement {
-    sid       = "allowCloudWatchLogs"
-    effect    = "Allow"
+    sid    = "allowCloudWatchLogs"
+    effect = "Allow"
     resources = [
       "*"
     ]
-    actions   = [
+    actions = [
       "logs:*"
     ]
   }
   statement {
-    sid       = "allowS3Buckets"
-    effect    = "Allow"
+    sid    = "allowS3Buckets"
+    effect = "Allow"
     resources = [
       "*",
     ]
-    actions   = [
+    actions = [
       "s3:*"
     ]
   }
   statement {
-    sid       = "allowSecretsManager"
-    effect    = "Allow"
+    sid    = "allowSecretsManager"
+    effect = "Allow"
     resources = [
-      "*"]
-    actions   = [
+    "*"]
+    actions = [
       "secretsmanager:GetSecretValue"
     ]
   }
   statement {
-    sid       = "allowSSMParametersStore"
-    effect    = "Allow"
+    sid    = "allowSSMParametersStore"
+    effect = "Allow"
     resources = [
-      "*"]
-    actions   = [
+    "*"]
+    actions = [
       "ssm:*"
     ]
   }
   statement {
-    sid       = "allowDynamoDb"
-    effect    = "Allow"
+    sid    = "allowDynamoDb"
+    effect = "Allow"
     resources = [
-      "*"]
-    actions   = [
+    "*"]
+    actions = [
       "dynamodb:*"
     ]
   }
@@ -136,11 +138,11 @@ data "aws_iam_policy_document" "code_build" {
     ]
 
     actions = [
-      "apigateway:*"]
+    "apigateway:*"]
   }
 }
 
-##########pipeline##############
+########## code pipeline role ##############
 
 resource "aws_iam_role" "code_pipeline" {
   name               = "xlive-telegram-bot-code-pipeline-role"
@@ -156,21 +158,21 @@ resource "aws_iam_policy" "code_pipeline" {
 }
 
 resource "aws_iam_policy_attachment" "code_pipeline" {
-  name       = "xlive-telegram-bot-pipeline-policy-attachment"
-  roles      = [
-    aws_iam_role.code_pipeline.name]
+  name = "xlive-telegram-bot-pipeline-policy-attachment"
+  roles = [
+  aws_iam_role.code_pipeline.name]
   policy_arn = aws_iam_policy.code_pipeline.arn
 }
 
 data "aws_iam_policy_document" "code_pipeline_assume" {
   statement {
     actions = [
-      "sts:AssumeRole"]
+    "sts:AssumeRole"]
 
     principals {
-      type        = "Service"
+      type = "Service"
       identifiers = [
-        "codepipeline.amazonaws.com"]
+      "codepipeline.amazonaws.com"]
     }
   }
 }

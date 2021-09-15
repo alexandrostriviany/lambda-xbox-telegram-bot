@@ -4,19 +4,13 @@ resource "aws_cloudwatch_log_group" "codebuild" {
   retention_in_days = 30
 }
 
-//resource "aws_codebuild_source_credential" "github" {
-//  auth_type   = "PERSONAL_ACCESS_TOKEN"
-//  server_type = "GITHUB"
-//  token       = var.git_token
-//}
-
 ########################################
 ##  CodeBuild - Build xlive-price-bot ##
 ########################################
 
 resource "aws_codebuild_project" "telegram_bot_build" {
-  name          = "xlive-price-bot"
-  description   = "Build xlive-price-bot Telegram Bot Project"
+  name          = var.lambda_bot_name
+  description   = "Build ${var.lambda_bot_name} Telegram Bot Project"
   build_timeout = 20
   service_role  = aws_iam_role.code_build_role.arn
 
@@ -30,13 +24,13 @@ resource "aws_codebuild_project" "telegram_bot_build" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "terraform/ci/specs/buildspec-build.yml"
+    buildspec = "terraform/ci/specs/buildspec-xlive-price-bot-build.yml"
   }
 
   cache {
-    type  = "LOCAL"
+    type = "LOCAL"
     modes = [
-      "LOCAL_DOCKER_LAYER_CACHE"]
+    "LOCAL_DOCKER_LAYER_CACHE"]
   }
 
   artifacts {
@@ -46,7 +40,7 @@ resource "aws_codebuild_project" "telegram_bot_build" {
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "xlive-price-bot-build"
+      stream_name = "${var.lambda_bot_name}-build"
     }
   }
 }
@@ -56,8 +50,8 @@ resource "aws_codebuild_project" "telegram_bot_build" {
 ###########################################
 
 resource "aws_codebuild_project" "xlive_price_filler_build" {
-  name          = "xlive-price-filler"
-  description   = "Build xlive-price-filler"
+  name          = var.lambda_filler_name
+  description   = "Build ${var.lambda_filler_name} Lambda project"
   build_timeout = 20
   service_role  = aws_iam_role.code_build_role.arn
 
@@ -75,10 +69,11 @@ resource "aws_codebuild_project" "xlive_price_filler_build" {
   }
 
   cache {
-    type  = "LOCAL"
+    type = "LOCAL"
     modes = [
-      "LOCAL_DOCKER_LAYER_CACHE"]
+    "LOCAL_DOCKER_LAYER_CACHE"]
   }
+
   artifacts {
     type = "CODEPIPELINE"
   }
@@ -86,7 +81,7 @@ resource "aws_codebuild_project" "xlive_price_filler_build" {
   logs_config {
     cloudwatch_logs {
       group_name  = aws_cloudwatch_log_group.codebuild.name
-      stream_name = "xlive-price-filler-build"
+      stream_name = "${var.lambda_filler_name}-build"
     }
   }
 }
@@ -115,9 +110,9 @@ resource "aws_codebuild_project" "deploy" {
   }
 
   cache {
-    type  = "LOCAL"
+    type = "LOCAL"
     modes = [
-      "LOCAL_DOCKER_LAYER_CACHE"]
+    "LOCAL_DOCKER_LAYER_CACHE"]
   }
 
   artifacts {
@@ -138,7 +133,7 @@ resource "aws_codebuild_project" "deploy" {
 
 resource "aws_codebuild_project" "set_webhook" {
   name          = "set-webhook"
-  description   = "Deploy xlive-price-application"
+  description   = "Set Telegram Bot webhook to ApiGW"
   build_timeout = 20
   service_role  = aws_iam_role.code_build_role.arn
 
@@ -156,9 +151,9 @@ resource "aws_codebuild_project" "set_webhook" {
   }
 
   cache {
-    type  = "LOCAL"
+    type = "LOCAL"
     modes = [
-      "LOCAL_DOCKER_LAYER_CACHE"]
+    "LOCAL_DOCKER_LAYER_CACHE"]
   }
 
   artifacts {

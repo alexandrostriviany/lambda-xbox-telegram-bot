@@ -6,4 +6,5 @@ env:
 phases:
   build:
     commands:
+      - echo "[INFO] set up telegram bot webhook"
       - curl -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/setWebhook?url=${API_GW}"

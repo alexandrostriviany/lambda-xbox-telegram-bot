@@ -10,12 +10,12 @@ resource "aws_dynamodb_table" "price-dynamodb-table" {
     type = "S"
   }
 
-//  ttl {
-//    attribute_name = "TimeToExist"
-//    enabled        = false
-//  }
+  //  ttl {
+  //    attribute_name = "TimeToExist"
+  //    enabled        = false
+  //  }
 
   tags = {
-    Name        = "price-dynamodb-table"
+    Name = "price-dynamodb-table"
   }
 }

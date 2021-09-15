@@ -1,5 +1,15 @@
 provider "aws" {
-  region  = var.region
+  region = var.region
+}
+
+terraform {
+  backend "s3" {
+    bucket         = "xlive-bot-terraform-state"
+    dynamodb_table = "terraform_locks"
+    key            = "dev/terraform.tfstate"
+    encrypt        = "true"
+    region         = "eu-central-1"
+  }
 }
 
 data "aws_ssm_parameter" "token" {
@@ -16,22 +26,11 @@ data "aws_ssm_parameter" "path" {
 
 resource "aws_ssm_parameter" "base_url" {
   name        = "/XlivePriceBot/base_url"
-  description = "Api GW base url"
+  description = "Bot ApiGW base url"
   type        = "SecureString"
   value       = "${aws_api_gateway_deployment.bot-api-deployment.invoke_url}/${aws_api_gateway_resource.resource.path_part}"
-
-
-tags = {
+  tags = {
     environment = "production"
   }
 }
 
-terraform {
-  backend "s3" {
-    bucket         = "xlive-bot-terraform-state"
-    dynamodb_table = "terraform_locks"
-    key            = "dev/terraform.tfstate"
-    encrypt        = "true"
-    region         = "eu-central-1"
-  }
-}

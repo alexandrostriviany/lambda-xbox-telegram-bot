@@ -1,10 +1,8 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_lambda_function" "xlive-price-filler" {
-
   s3_bucket = var.artifacts_s3_store
-  s3_key    = "xlive-price-filler.zip"
-
+  s3_key    = "${var.lambda_filler_name}.zip"
   function_name = var.lambda_filler_name
   handler       = "com.lambdatelegram.App"
   role          = aws_iam_role.lambda_exec.arn
@@ -22,11 +20,8 @@ resource "aws_lambda_function" "xlive-price-filler" {
 }
 
 resource "aws_lambda_function" "xlive-price-bot-lambda" {
-
-
   s3_bucket = var.artifacts_s3_store
-  s3_key    = "xlive-price-bot.zip"
-
+  s3_key    = "${var.lambda_bot_name}.zip"
   function_name = var.lambda_bot_name
   handler       = "com.lambdatelegram.xlivepricebot.App"
   role          = aws_iam_role.lambda_exec.arn
